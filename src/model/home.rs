@@ -19,10 +19,10 @@ pub struct NewHome {
     pub body: String,
 }
 
-impl NewHome {
-    /// Constructs new user details from name.
-    #[cfg(test)] // only needed in tests
-    pub fn new(title: impl Into<String>, body: impl Into<String>) -> Self {
-        Self { title: title.into(), body: body.into() }
-    }
-}
+// impl NewHome {
+//     /// Constructs new user details from name.
+//     #[cfg(test)] // only needed in tests
+//     pub fn new(title: impl Into<String>, body: impl Into<String>) -> Self {
+//         Self { title: title.into(), body: body.into() }
+//     }
+// }
