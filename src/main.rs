@@ -1,44 +1,25 @@
-use actix_web::{error, get, middleware, post, web, App, HttpResponse, HttpServer, Responder, Result};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use diesel::{prelude::*, r2d2};
 
-
+mod api;
 mod actions;
-mod models;
+mod model;
 mod schema;
 
+use api::home::{
+  all_homes,
+  add_home,
+  find_home
+};
+
 type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
-
-#[get("/home")]
-async fn all_homes(pool: web::Data<DbPool>) -> Result<impl Responder> {
-    let all_homes = web::block(move || {
-      let mut conn = pool.get()?;
-      actions::find_all_homes(&mut conn)
-    })
-    .await?
-    .map_err(error::ErrorInternalServerError)?;
-
-  Ok(HttpResponse::Ok().json(all_homes))
-}
-
-#[post("/home")]
-async fn add_home(
-  pool: web::Data<DbPool>,
-  form: web::Json<models::NewHome>,
-) -> Result<impl Responder> {
-  let home = web::block(move || {
-    let mut conn = pool.get()?;
-    actions::insert_new_home(&mut conn, &form)
-  })
-  .await?
-  .map_err(error::ErrorInternalServerError)?;
-
-  Ok(HttpResponse::Created().json(home))
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    std::env::set_var("RUST_LOG", "debug");
+    std::env::set_var("RUST_BACKTRACE", "1");
+    env_logger::init();
 
     // initialize DB pool outside of `HttpServer::new` so that it is shared across all workers
     let pool = initialize_db_pool();
@@ -46,14 +27,15 @@ async fn main() -> std::io::Result<()> {
     log::info!("starting HTTP server at http://localhost:8080");
 
     HttpServer::new(move || {
-        App::new()
-            // add DB pool handle to app data; enables use of `web::Data<DbPool>` extractor
-            .app_data(web::Data::new(pool.clone()))
-            // add request logger middleware
-            .wrap(middleware::Logger::default())
-            // add route handlers
-            .service(all_homes)
-            .service(add_home)
+      let logger = Logger::default();
+      App::new()
+        .app_data(web::Data::new(pool.clone()))
+        // add request logger middleware
+        .wrap(logger)
+        // add route handlers
+        .service(all_homes)
+        .service(add_home)
+        .service(find_home)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
