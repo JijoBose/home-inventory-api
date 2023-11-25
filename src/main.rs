@@ -1,5 +1,9 @@
-use actix_web::{middleware::Logger, web, App, HttpServer};
-use diesel::{prelude::*, r2d2};
+use std::error::Error;
+
+use actix_web::{middleware::Logger, web::{self, ServiceConfig}, App, HttpServer};
+use diesel::{prelude::*, r2d2, sqlite::Sqlite};
+use shuttle_actix_web::ShuttleActixWeb;
+use diesel_migrations::{EmbeddedMigrations, embed_migrations, MigrationHarness};
 
 mod api;
 mod actions;
@@ -14,6 +18,20 @@ use api::home::{
 
 type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
 
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
+
+fn run_migrations(connection: &mut impl MigrationHarness<Sqlite>) -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
+  connection.run_pending_migrations(MIGRATIONS)?;
+  Ok(())
+}
+
+fn initial_migration() {
+  let sqlite_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL should be set");
+  let mut connection = SqliteConnection::establish(&sqlite_spec).expect("Failed to establish connection");
+  let _ = run_migrations(&mut connection);
+}
+
+#[cfg(debug_assertions)]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
@@ -21,18 +39,16 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
 
-    // initialize DB pool outside of `HttpServer::new` so that it is shared across all workers
     let pool = initialize_db_pool();
 
     log::info!("starting HTTP server at http://localhost:8080");
+    initial_migration();
 
     HttpServer::new(move || {
       let logger = Logger::default();
       App::new()
         .app_data(web::Data::new(pool.clone()))
-        // add request logger middleware
         .wrap(logger)
-        // add route handlers
         .service(all_homes)
         .service(add_home)
         .service(find_home)
@@ -40,6 +56,23 @@ async fn main() -> std::io::Result<()> {
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
+}
+
+#[cfg(not(debug_assertions))]
+#[shuttle_runtime::main]
+async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
+  dotenvy::dotenv().ok();
+  let pool = initialize_db_pool();
+
+  initial_migration();
+
+  let config = move |cfg: &mut ServiceConfig| {
+    cfg.app_data(web::Data::new(pool.clone()));
+    cfg.service(all_homes);
+    cfg.service(add_home);
+    cfg.service(find_home);
+  };
+  Ok(config.into())
 }
 
 /// Initialize database connection pool based on `DATABASE_URL` environment variable.
