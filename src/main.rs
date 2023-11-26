@@ -1,35 +1,19 @@
-use std::error::Error;
-
 use actix_web::{middleware::Logger, web::{self, ServiceConfig}, App, HttpServer};
-use diesel::{prelude::*, r2d2, sqlite::Sqlite};
 use shuttle_actix_web::ShuttleActixWeb;
-use diesel_migrations::{EmbeddedMigrations, embed_migrations, MigrationHarness};
 
-mod api;
-mod actions;
-mod model;
-mod schema;
+pub mod app;
+pub mod schema;
 
-use api::home::{
+use app::api::home::{
   all_homes,
   add_home,
   find_home
 };
 
-type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
-
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
-
-fn run_migrations(connection: &mut impl MigrationHarness<Sqlite>) -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
-  connection.run_pending_migrations(MIGRATIONS)?;
-  Ok(())
-}
-
-fn initial_migration() {
-  let sqlite_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL should be set");
-  let mut connection = SqliteConnection::establish(&sqlite_spec).expect("Failed to establish connection");
-  let _ = run_migrations(&mut connection);
-}
+use app::db::{
+  initialize_db_pool,
+  initial_migration
+};
 
 #[cfg(debug_assertions)]
 #[actix_web::main]
@@ -73,15 +57,4 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clon
     cfg.service(find_home);
   };
   Ok(config.into())
-}
-
-/// Initialize database connection pool based on `DATABASE_URL` environment variable.
-///
-/// See more: <https://docs.rs/diesel/latest/diesel/r2d2/index.html>.
-fn initialize_db_pool() -> DbPool {
-    let conn_spec = std::env::var("DATABASE_URL").expect("DATABASE_URL should be set");
-    let manager = r2d2::ConnectionManager::<SqliteConnection>::new(conn_spec);
-    r2d2::Pool::builder()
-        .build(manager)
-        .expect("database URL should be valid path to SQLite DB file")
 }

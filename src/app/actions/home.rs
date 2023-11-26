@@ -2,7 +2,7 @@ use actix_web::web::Json;
 use diesel::prelude::*;
 use uuid::Uuid;
 
-use crate::model::home;
+use crate::app::models::home;
 
 type DbError = Box<dyn std::error::Error + Send + Sync>;
 

@@ -2,8 +2,8 @@ use actix_web::{web, get, post, Result, Responder, error, HttpResponse};
 use diesel::{SqliteConnection, r2d2};
 use uuid::Uuid;
 
-use crate::actions;
-use crate::model;
+use crate::app::actions;
+use crate::app::models;
 
 type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
 
@@ -38,7 +38,7 @@ async fn find_home(pool: web::Data<DbPool>, home_id: web::Path<Uuid>) -> Result<
 #[post("/home")]
 async fn add_home(
   pool: web::Data<DbPool>,
-  form: web::Json<model::home::NewHome>,
+  form: web::Json<models::home::NewHome>,
 ) -> Result<impl Responder> {
   let home = web::block(move || {
     let mut conn = pool.get()?;
