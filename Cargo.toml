@@ -17,5 +17,5 @@ env_logger = "0.10"
 log = "0.4"
 strum_macros = "0.25.3"
 strum = { version = "0.25.0", featuers = ["derive"]}
-shuttle-actix-web = "0.34.0"
-shuttle-runtime = "0.34.0"
+shuttle-actix-web = "0.35.1"
+shuttle-runtime = "0.35.1"
