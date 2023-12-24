@@ -6,7 +6,8 @@ pub mod schema;
 use app::api::home::{
   all_homes,
   add_home,
-  find_home
+  find_home,
+  delete_home
 };
 
 use app::db::{
@@ -35,6 +36,7 @@ async fn main() -> std::io::Result<()> {
         .service(all_homes)
         .service(add_home)
         .service(find_home)
+        .service(delete_home)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
