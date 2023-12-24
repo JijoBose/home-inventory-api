@@ -1,11 +1,11 @@
 use actix_web::{web, get, post, Result, Responder, error, HttpResponse};
-use diesel::{SqliteConnection, r2d2};
+use diesel::{PgConnection, r2d2};
 use uuid::Uuid;
 
 use crate::app::actions;
 use crate::app::models;
 
-type DbPool = r2d2::Pool<r2d2::ConnectionManager<SqliteConnection>>;
+type DbPool = r2d2::Pool<r2d2::ConnectionManager<PgConnection>>;
 
 #[get("/home")]
 async fn all_homes(pool: web::Data<DbPool>) -> Result<impl Responder> {

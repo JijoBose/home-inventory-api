@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4.4.0"
-diesel = { version = "2.1.4", features = ["sqlite", "r2d2"] }
+diesel = { version = "2.1.4", features = ["postgres", "r2d2"] }
 diesel_migrations = "2.1.0"
 dotenvy = "0.15.7"
 dotenv = "0.15.0"
@@ -16,6 +16,6 @@ uuid = { version = "1", features = ["v4", "serde"] }
 env_logger = "0.10"
 log = "0.4"
 strum_macros = "0.25.3"
-strum = { version = "0.25.0", featuers = ["derive"]}
+strum = { version = "0.25.0", features = ["derive"]}
 shuttle-actix-web = "0.35.1"
 shuttle-runtime = "0.35.1"
