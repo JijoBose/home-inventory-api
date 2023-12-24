@@ -6,7 +6,7 @@ use crate::app::models::home;
 
 type DbError = Box<dyn std::error::Error + Send + Sync>;
 
-pub fn find_all_homes(conn: &mut SqliteConnection) -> Result<Vec<home::Home>, DbError> {
+pub fn find_all_homes(conn: &mut PgConnection) -> Result<Vec<home::Home>, DbError> {
     use crate::schema::homes::dsl::*;
 
     let get_homes = homes.load::<home::Home>(conn)?;
@@ -14,7 +14,7 @@ pub fn find_all_homes(conn: &mut SqliteConnection) -> Result<Vec<home::Home>, Db
 }
 
 pub fn find_home_by_uid(
-    conn: &mut SqliteConnection,
+    conn: &mut PgConnection,
     uid: Uuid,
 ) -> Result<Option<home::Home>, DbError> {
     use crate::schema::homes::dsl::*;
@@ -28,7 +28,7 @@ pub fn find_home_by_uid(
 }
 
 pub fn insert_new_home(
-    conn: &mut SqliteConnection,
+    conn: &mut PgConnection,
     form: &Json<home::NewHome>,
 ) -> Result<home::Home, DbError> {
     use crate::schema::homes::dsl::*;
