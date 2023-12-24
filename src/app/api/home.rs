@@ -1,4 +1,4 @@
-use actix_web::{web, get, post, Result, Responder, error, HttpResponse};
+use actix_web::{web, get, post, delete, Result, Responder, error, HttpResponse};
 use diesel::{PgConnection, r2d2};
 use uuid::Uuid;
 
@@ -43,6 +43,22 @@ async fn add_home(
   let home = web::block(move || {
     let mut conn = pool.get()?;
     actions::home::insert_new_home(&mut conn, &form)
+  })
+  .await?
+  .map_err(error::ErrorInternalServerError)?;
+
+  Ok(HttpResponse::Created().json(home))
+}
+
+#[delete("/home/{home_id}")]
+async fn delete_home(
+  pool: web::Data<DbPool>,
+  home_id: web::Path<Uuid>,
+) -> Result<impl Responder> {
+  let home_uid = home_id.into_inner();
+  let home = web::block(move || {
+    let mut conn = pool.get()?;
+    actions::home::delete_home(&mut conn, home_uid)
   })
   .await?
   .map_err(error::ErrorInternalServerError)?;

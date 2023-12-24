@@ -43,3 +43,18 @@ pub fn insert_new_home(
 
     Ok(new_home)
 }
+
+pub fn delete_home(
+  conn: &mut PgConnection,
+  uid: Uuid,
+) -> Result<String, DbError> {
+  use crate::schema::homes::dsl::*;
+
+  let result = diesel::delete(homes.filter(id.eq(uid.to_string())))
+        .execute(conn);
+
+  match result {
+    Ok(_) => Ok("Success".to_string()),
+    Err(e) => Err(DbError::from(e)),
+  }
+}
