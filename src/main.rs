@@ -15,7 +15,7 @@ use app::db::{
   initial_migration
 };
 
-#[cfg(debug_assertions)]
+// #[cfg(debug_assertions)]
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
