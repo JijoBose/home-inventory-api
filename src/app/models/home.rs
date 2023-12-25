@@ -1,4 +1,4 @@
-use diesel::{Queryable, prelude::Insertable};
+use diesel::{prelude::Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
 use crate::schema::homes;
@@ -9,7 +9,7 @@ use crate::schema::homes;
 pub struct Home {
     pub id: String,
     pub title: String,
-    pub body: String
+    pub body: String,
 }
 
 /// New user details.
@@ -17,6 +17,19 @@ pub struct Home {
 pub struct NewHome {
     pub title: String,
     pub body: String,
+}
+
+// validations
+impl NewHome {
+  pub fn validate(&self) -> Result<(), String> {
+      if self.title.trim().is_empty() {
+          return Err("Name is empty".to_string());
+      }
+      if self.body.trim().is_empty() {
+          return Err("Desciption is empty".to_string());
+      }
+      Ok(())
+  }
 }
 
 // impl NewHome {
