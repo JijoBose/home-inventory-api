@@ -1,10 +1,10 @@
-use diesel::{prelude::Insertable, Queryable};
+use diesel::{prelude::Insertable, Queryable, associations::Identifiable};
 use serde::{Deserialize, Serialize};
 
 use crate::schema::homes;
 
 /// User details.
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, PartialEq, Identifiable, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = homes)]
 pub struct Home {
     pub id: String,

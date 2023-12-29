@@ -10,6 +10,8 @@ use app::api::home::{
   delete_home
 };
 
+use app::api::room::add_room;
+
 use app::db::{
   initialize_db_pool,
   initial_migration
@@ -37,6 +39,7 @@ async fn main() -> std::io::Result<()> {
         .service(add_home)
         .service(find_home)
         .service(delete_home)
+        .service(add_room)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
