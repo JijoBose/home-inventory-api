@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 use diesel::{prelude::Insertable, Queryable};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::schema::rooms;
 use crate::app::models::home::Home;
@@ -13,6 +14,11 @@ pub struct Room {
     pub id: String,
     pub name: String,
     pub home_id: String,
+}
+
+#[derive(Deserialize)]
+pub struct RoomQuery {
+    pub home_id: Uuid,
 }
 
 /// New room details.

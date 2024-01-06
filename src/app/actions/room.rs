@@ -6,6 +6,14 @@ use crate::app::models::room;
 
 type DbError = Box<dyn std::error::Error + Send + Sync>;
 
+pub fn list_rooms(conn: &mut PgConnection, uid: Uuid) -> Result<Vec<room::Room>, DbError> {
+    use crate::schema::rooms::dsl::*;
+
+    let room_list = rooms.filter(home_id.eq(uid.to_string())).load(conn)?;
+
+    Ok(room_list)
+}
+
 pub fn insert_new_room(
     conn: &mut PgConnection,
     form: &Json<room::NewRoom>,
