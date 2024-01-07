@@ -11,6 +11,7 @@ use app::api::home::{
 };
 
 use app::api::room::{add_room, get_room};
+use app::api::item::{add_item, get_items};
 
 use app::db::{
   initialize_db_pool,
@@ -41,6 +42,8 @@ async fn main() -> std::io::Result<()> {
         .service(delete_home)
         .service(add_room)
         .service(get_room)
+        .service(get_items)
+        .service(add_item)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

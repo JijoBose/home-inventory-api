@@ -5,4 +5,5 @@ pub mod db;
 pub mod models {
   pub mod home;
   pub mod room;
+  pub mod item;
 }

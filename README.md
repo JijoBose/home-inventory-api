@@ -15,6 +15,10 @@ Run Migration
 
 ``diesel migration run``
 
+Undo Migration
+
+``diesel migration redo``
+
 Run Cargo
 
 ``cargo run``
