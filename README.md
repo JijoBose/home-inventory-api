@@ -3,7 +3,7 @@ Built with actix
 
 ## Development
 
-#### Compile the current package 
+#### Compile the current package
 - ``cargo build``
 
 #### Setup the database and migration
@@ -14,7 +14,6 @@ Built with actix
 #### Run the App
 
 - ``cargo run``
-
 
 
 ## How to's

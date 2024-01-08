@@ -1,51 +1,40 @@
-use actix_web::{middleware::Logger, web::{self}, App, HttpServer};
+use actix_web::{
+    web::ServiceConfig,
+    web::{self},
+};
+use shuttle_actix_web::ShuttleActixWeb;
 
 pub mod app;
 pub mod schema;
 
-use app::api::home::{
-  all_homes,
-  add_home,
-  find_home,
-  delete_home
-};
-
-use app::api::room::{add_room, get_room};
+use app::api::home::{add_home, all_homes, delete_home, find_home};
 use app::api::item::{add_item, get_items};
+use app::api::room::{add_room, get_room};
 
-use app::db::{
-  initialize_db_pool,
-  initial_migration
-};
+use app::db::{initial_migration, initialize_db_pool};
 
-// #[cfg(debug_assertions)]
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[shuttle_runtime::main]
+async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clone + 'static> {
     dotenvy::dotenv().ok();
-    std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_BACKTRACE", "1");
-    env_logger::init();
 
     let pool = initialize_db_pool();
 
-    log::info!("starting HTTP server at http://localhost:8080");
     initial_migration();
 
-    HttpServer::new(move || {
-      let logger = Logger::default();
-      App::new()
-        .app_data(web::Data::new(pool.clone()))
-        .wrap(logger)
-        .service(all_homes)
-        .service(add_home)
-        .service(find_home)
-        .service(delete_home)
-        .service(add_room)
-        .service(get_room)
-        .service(get_items)
-        .service(add_item)
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+    let config = move |cfg: &mut ServiceConfig| {
+        cfg.app_data(web::Data::new(pool.clone()));
+        // Homes
+        cfg.service(all_homes);
+        cfg.service(add_home);
+        cfg.service(find_home);
+        cfg.service(delete_home);
+        // Rooms
+        cfg.service(add_room);
+        cfg.service(get_room);
+        // Items
+        cfg.service(add_item);
+        cfg.service(get_items);
+    };
+
+    Ok(config.into())
 }
