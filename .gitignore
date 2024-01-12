@@ -1,4 +1,4 @@
 /target
 test.db
 .DS_Store
-Secrets.toml
+.env
