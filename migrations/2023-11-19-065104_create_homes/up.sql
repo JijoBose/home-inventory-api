@@ -1,6 +1,0 @@
--- Your SQL goes here
-CREATE TABLE homes (
-  id VARCHAR NOT NULL PRIMARY KEY,
-  title VARCHAR NOT NULL,
-  body TEXT NOT NULL
-)
