@@ -1,15 +1,10 @@
 ### Home Inventory API
-Built with actix
+Built with Axum and SeaORM
 
 ## Development
 
 #### Compile the current package
 - ``cargo build``
-
-#### Setup the database and migration
-
-- ``diesel setup``
-- ``diesel migration run``
 
 #### Run the App
 
@@ -21,15 +16,13 @@ Built with actix
 
 **Create new table**
 
-``diesel migration generate create_homes``
+``sea-orm-cli migrate generate create_room``
 
-**Run Migration**
+**Migrate**
 
-``diesel migration run``
+- ``sea-orm-cli migrate``
 
-**Undo Migration**
+**Update Entity**
 
-``diesel migration redo``
+``sea-orm-cli generate entity -u postgres://jijobose:password@localhost/loco_app -o src/database/``
 
-sea-orm-cli generate entity -u protocol://user:password@localhost/database_name -o entity/src
-sea-orm-cli migrate
