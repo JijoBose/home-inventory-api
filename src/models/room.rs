@@ -1,31 +1,24 @@
-use diesel::prelude::*;
-use diesel::{prelude::Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::schema::rooms;
-use crate::app::models::home::Home;
-
 /// Room details.
-#[derive(Queryable, Serialize, Selectable, Identifiable, Associations, Debug, PartialEq, Insertable)]
-#[diesel(belongs_to(Home))]
-#[diesel(table_name = rooms)]
+#[derive(Serialize, Debug, PartialEq)]
 pub struct Room {
     pub id: String,
     pub name: String,
-    pub home_id: String,
+    pub house_id: String,
 }
 
 #[derive(Deserialize)]
 pub struct RoomQuery {
-    pub home_id: Uuid,
+    pub house_id: Uuid,
 }
 
 /// New room details.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewRoom {
     pub name: String,
-    pub home_id: String,
+    pub house_id: String,
 }
 
 // validations

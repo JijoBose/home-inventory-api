@@ -3,7 +3,7 @@ Built with actix
 
 ## Development
 
-#### Compile the current package 
+#### Compile the current package
 - ``cargo build``
 
 #### Setup the database and migration
@@ -30,3 +30,6 @@ Built with actix
 **Undo Migration**
 
 ``diesel migration redo``
+
+sea-orm-cli generate entity -u protocol://user:password@localhost/database_name -o entity/src
+sea-orm-cli migrate

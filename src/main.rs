@@ -1,55 +1,42 @@
-use actix_web::{middleware::Logger, web::{self}, App, HttpServer};
+use std::sync::Arc;
+use anyhow::Ok;
+use axum::serve;
+use sea_orm::{Database, DatabaseConnection};
+use tokio::net::TcpListener;
+use dotenvy_macro::dotenv;
 
-pub mod app;
-pub mod schema;
+pub mod routes;
+pub mod api;
+pub mod models;
+pub mod database;
 
-use app::api::home::{
-  all_homes,
-  add_home,
-  find_home,
-  delete_home
-};
+pub struct AppState {
+  db: DatabaseConnection,
+}
 
-use app::api::room::{add_room, get_room};
-use app::api::item::{add_item, get_items, delete_item};
-
-use app::db::{
-  initialize_db_pool,
-  initial_migration
-};
-
-// #[cfg(debug_assertions)]
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn start() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
-    std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_BACKTRACE", "1");
-    env_logger::init();
+    let database_uri = dotenv!("DATABASE_URL");
+    let db_connection = Database::connect(database_uri)
+      .await
+      .expect("Database connection failed");
 
-    let pool = initialize_db_pool();
+    // Initialize tracing
+    tracing_subscriber::fmt::init();
 
-    log::info!("starting HTTP server at http://localhost:8080");
-    initial_migration();
+    let app = routes::create_routes(Arc::new(AppState { db: db_connection.clone() }));
 
-    HttpServer::new(move || {
-      let logger = Logger::default();
-      App::new()
-        .app_data(web::Data::new(pool.clone()))
-        .wrap(logger)
-        // Home API
-        .service(all_homes)
-        .service(add_home)
-        .service(find_home)
-        .service(delete_home)
-        // Room
-        .service(add_room)
-        .service(get_room)
-        // Iventory Item
-        .service(get_items)
-        .service(add_item)
-        .service(delete_item)
-    })
-    .bind(("127.0.0.1", 8080))?
-    .run()
-    .await
+    let listner = TcpListener::bind(&"0.0.0.0:3000").await.unwrap();
+    serve(listner, app).await?;
+
+    Ok(())
+}
+
+pub fn main() {
+  let result = start();
+
+  if let Some(err) = result.err() {
+    println!("Error: {err}");
+  }
 }

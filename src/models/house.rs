@@ -1,26 +1,28 @@
-use diesel::{prelude::Insertable, Queryable, associations::Identifiable};
 use serde::{Deserialize, Serialize};
 
-use crate::schema::homes;
-
-/// User details.
-#[derive(Debug, Clone, PartialEq, Identifiable, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = homes)]
-pub struct Home {
+/// House details.
+#[derive(Serialize)]
+pub struct House {
     pub id: String,
     pub title: String,
     pub body: String,
 }
 
-/// New user details.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewHome {
+/// New House
+#[derive(Deserialize)]
+pub struct CreateHouse {
     pub title: String,
     pub body: String,
 }
 
+pub struct DeleteResponse {
+  pub success: bool,
+  pub message: String,
+}
+
+
 // validations
-impl NewHome {
+impl CreateHouse {
   pub fn validate(&self) -> Result<(), String> {
       if self.title.trim().is_empty() {
           return Err("Name is empty".to_string());
@@ -32,7 +34,7 @@ impl NewHome {
   }
 }
 
-// impl NewHome {
+// impl NewHouse {
 //     /// Constructs new user details from name.
 //     #[cfg(test)] // only needed in tests
 //     pub fn new(title: impl Into<String>, body: impl Into<String>) -> Self {

@@ -1,15 +1,8 @@
-use diesel::prelude::*;
-use diesel::{prelude::Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::schema::items;
-use crate::app::models::room::Room;
-
 /// Item details.
-#[derive(Queryable, Serialize, Selectable, Identifiable, Associations, Debug, PartialEq, Insertable)]
-#[diesel(belongs_to(Room))]
-#[diesel(table_name = items)]
+#[derive(Serialize, Debug, PartialEq)]
 pub struct Item {
     pub id: String,
     pub name: String,
