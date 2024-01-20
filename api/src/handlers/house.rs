@@ -1,7 +1,8 @@
 use std::sync::Arc;
 
-use crate::database::house;
-use crate::{database::house::Entity as HouseEntity, AppState};
+use crate::AppState;
+use entity::house;
+use entity::house::Entity as HouseEntity;
 use axum::extract::State;
 use axum::{extract::Path, http::StatusCode, Extension, Json};
 use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
