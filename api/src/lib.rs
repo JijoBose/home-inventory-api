@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use anyhow::Ok;
 use axum::serve;
+use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
 use tokio::net::TcpListener;
 
@@ -19,6 +20,8 @@ async fn start() -> anyhow::Result<()> {
     let db_connection = Database::connect(database_uri)
       .await
       .expect("Database connection failed");
+
+    Migrator::up(&db_connection, None).await?;
 
     // Initialize tracing
     tracing_subscriber::fmt::init();
