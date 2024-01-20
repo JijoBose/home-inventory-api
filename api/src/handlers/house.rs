@@ -4,8 +4,8 @@ use crate::AppState;
 use entity::house;
 use entity::house::Entity as HouseEntity;
 use axum::extract::State;
-use axum::{extract::Path, http::StatusCode, Extension, Json};
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
+use axum::{extract::Path, http::StatusCode, Json};
+use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 use uuid::Uuid;
 
 use crate::models::house::{CreateHouse, House};
@@ -26,6 +26,37 @@ pub async fn all_houses(
         .collect();
 
     Ok(Json(list_houses))
+}
+
+pub async fn update_house(
+  State(database): State<Arc<AppState>>,
+  Path(id): Path<Uuid>,
+  Json(house_params): Json<CreateHouse>,
+) -> Result<Json<House>, StatusCode> {
+
+  let update_house = house::ActiveModel {
+    id: Set(id.to_string()),
+    title: Set(house_params.title),
+    body: Set(house_params.body)
+  };
+
+  match update_house.update(&database.db).await {
+    Ok(updated_house) => {
+      let response_json = Json(House {
+        id: updated_house.id,
+        title: updated_house.title,
+        body: updated_house.body
+      });
+
+      Ok(response_json)
+    }
+    Err(db_err) => {
+      let status_code = match db_err {
+        _ => StatusCode::INTERNAL_SERVER_ERROR,
+      };
+      Err(status_code)
+    }
+  }
 }
 
 pub async fn create_house(
@@ -58,15 +89,14 @@ pub async fn create_house(
     }
 }
 
-// Todo - Database implementation required
 pub async fn find_house(
-    Extension(database): Extension<DatabaseConnection>,
-    Path(house_id): Path<Uuid>,
+    State(database): State<Arc<AppState>>,
+    Path(id): Path<Uuid>,
 ) -> Result<Json<House>, StatusCode> {
-    let house_id = house_id.to_owned();
+    let id = id.to_owned();
 
-    let house = HouseEntity::find_by_id(house_id)
-        .one(&database)
+    let house = HouseEntity::find_by_id(id)
+        .one(&database.db)
         .await
         .unwrap();
 
@@ -81,16 +111,15 @@ pub async fn find_house(
     }
 }
 
-// Todo - Database implementation required
 pub async fn delete_house(
-    Extension(database): Extension<DatabaseConnection>,
-    Path(house_id): Path<Uuid>,
+    State(database): State<Arc<AppState>>,
+    Path(id): Path<Uuid>,
 ) -> Result<(), StatusCode> {
-    let house_id = house_id.to_owned();
-    HouseEntity::delete_by_id(house_id)
-        .exec(&database)
+    let id = id.to_owned();
+    let _house = HouseEntity::delete_by_id(id)
+        .exec(&database.db)
         .await
-        .map_err(|_error| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|_error| StatusCode::INTERNAL_SERVER_ERROR);
 
     Ok(())
 }
