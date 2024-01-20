@@ -5,8 +5,8 @@ use axum::{
   Router,
 };
 
-use crate::{api, AppState};
-use api::house::{all_houses, create_house, find_house, delete_house};
+use crate::AppState;
+use crate::handlers::house::{all_houses, create_house, find_house, delete_house };
 
 pub fn create_routes(app_state: Arc<AppState>) -> Router {
 

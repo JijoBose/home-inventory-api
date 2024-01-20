@@ -24,4 +24,4 @@ Built with Axum and SeaORM
 
 **Update Entity**
 
-``sea-orm-cli generate entity -u postgres://jijobose:password@localhost/loco_app -o src/database/``
+``sea-orm-cli generate entity -u postgres://jijobose:password@localhost/loco_app -o entity/src``

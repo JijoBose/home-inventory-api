@@ -1,5 +1,5 @@
-use crate::database::house;
-use crate::database::house::Entity as HouseEntity;
+use entity::house;
+use entity::house::Entity as HouseEntity;
 
 use axum::{
   http::StatusCode,
@@ -9,7 +9,6 @@ use sea_orm::{DatabaseConnection, EntityTrait, Set, ActiveModelTrait};
 use uuid::Uuid;
 
 use crate::models::house::{House, CreateHouse};
-
 
 pub async fn all_houses(
   Extension(database): Extension<DatabaseConnection>,
