@@ -3,7 +3,6 @@ use anyhow::Ok;
 use axum::serve;
 use sea_orm::{Database, DatabaseConnection};
 use tokio::net::TcpListener;
-use dotenvy_macro::dotenv;
 
 pub mod routes;
 pub mod api;
@@ -16,8 +15,8 @@ pub struct AppState {
 
 #[tokio::main]
 async fn start() -> anyhow::Result<()> {
-    dotenvy::dotenv().ok();
-    let database_uri = dotenv!("DATABASE_URL");
+    dotenv::dotenv()?;
+    let database_uri = dotenvy::var("DATABASE_URL")?;
     let db_connection = Database::connect(database_uri)
       .await
       .expect("Database connection failed");
@@ -27,8 +26,8 @@ async fn start() -> anyhow::Result<()> {
 
     let app = routes::create_routes(Arc::new(AppState { db: db_connection.clone() }));
 
-    let listner = TcpListener::bind(&"0.0.0.0:3000").await.unwrap();
-    serve(listner, app).await?;
+    let listener = TcpListener::bind(&"0.0.0.0:3000").await.unwrap();
+    serve(listener, app).await?;
 
     Ok(())
 }

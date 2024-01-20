@@ -28,7 +28,7 @@ impl CreateHouse {
           return Err("Name is empty".to_string());
       }
       if self.body.trim().is_empty() {
-          return Err("Desciption is empty".to_string());
+          return Err("Description is empty".to_string());
       }
       Ok(())
   }
