@@ -16,13 +16,13 @@ pub struct RoomQuery {
 
 /// New room details.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewRoom {
+pub struct CreateRoom {
     pub name: String,
     pub house_id: String,
 }
 
 // validations
-impl NewRoom {
+impl CreateRoom {
   pub fn validate(&self) -> Result<(), String> {
       if self.name.trim().is_empty() {
           return Err("Name is empty".to_string());
