@@ -1,0 +1,8 @@
+<tr id="shuttle-house-{{ house.id }}">
+	<td> {{ house.id }} </td>
+	<td id="shuttle-house-desc-{{house.id}}"> {{ house.title }} </td>
+  <td id="shuttel-house-body={{house.id}}"> {{ house.body }}</td>
+	<td>
+    <button hx-delete="/houses/{{house.id}}" hx-trigger="click" hx-target="#shuttle-todo-{{house.id}}" hx-swap="delete">Delete</button>
+  </td>
+</tr>
