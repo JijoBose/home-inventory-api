@@ -4,9 +4,9 @@ use uuid::Uuid;
 /// Item details.
 #[derive(Serialize, Debug, PartialEq)]
 pub struct Item {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
-    pub room_id: String,
+    pub room_id: Uuid,
     pub description: Option<String>,
     pub category: String,
     pub purchase_date: String,
@@ -18,7 +18,7 @@ pub struct Item {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewItem {
     pub name: String,
-    pub room_id: String,
+    pub room_id: Uuid,
     pub description: Option<String>,
     pub category: String,
     pub purchase_date: String,

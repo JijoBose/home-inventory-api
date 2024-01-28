@@ -8,8 +8,9 @@ use entity::room::Entity as RoomEntity;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use uuid::Uuid;
 
-use crate::models::room::{CreateRoom, Room};
+use crate::models::room::{Room, CreateRoom};
 
+// Todo - Fix internal server error
 pub async fn list_rooms(
     State(database): State<Arc<AppState>>,
     Path(house_id): Path<Uuid>,
@@ -25,7 +26,7 @@ pub async fn list_rooms(
         .map(|db_room| Room {
             id: db_room.id.to_string(),
             name: db_room.name,
-            house_id: db_room.house_id,
+            house_id: db_room.house_id.to_string(),
         })
         .collect();
 
@@ -36,18 +37,20 @@ pub async fn create_rooms(
     State(database): State<Arc<AppState>>,
     Json(room_params): Json<CreateRoom>,
 ) -> Result<Json<Room>, StatusCode> {
+    let house_uuid = Uuid::parse_str(&room_params.house_id).unwrap();
     let new_room = room::ActiveModel {
-        id: Set(Uuid::new_v4().to_string()),
+        id: Set(Uuid::new_v4()),
         name: Set(room_params.name),
-        house_id: Set(room_params.house_id),
+        house_id: Set(house_uuid),
+        ..Default::default()
     };
 
     match new_room.insert(&database.db).await {
         Ok(inserted_room) => {
             let response_json = Json(Room {
-                id: inserted_room.id,
+                id: inserted_room.id.to_string(),
                 name: inserted_room.name,
-                house_id: inserted_room.house_id,
+                house_id: inserted_room.house_id.to_string(),
             });
 
             Ok(response_json)
