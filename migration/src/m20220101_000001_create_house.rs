@@ -13,7 +13,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(
                         ColumnDef::new(House::Id)
-                            .string()
+                            .uuid()
                             .not_null()
                             .primary_key(),
                     )

@@ -25,7 +25,7 @@ pub async fn create_house_web(
     Form(form): Form<HouseModel>,
 ) -> impl IntoResponse {
     let new_house = HouseActiveModel {
-        id: Set(Uuid::new_v4().to_string()),
+        id: Set(Uuid::new_v4()),
         title: Set(form.title),
         body: Set(form.body),
         ..Default::default()

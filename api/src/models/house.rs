@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 /// House details.
 #[derive(Serialize)]
 pub struct House {
-    pub id: String,
+    pub id: Uuid,
     pub title: String,
     pub body: String,
 }

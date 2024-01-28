@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
 use crate::AppState;
-use entity::house;
-use entity::house::Entity as HouseEntity;
 use axum::extract::State;
 use axum::{extract::Path, http::StatusCode, Json};
+use entity::house;
+use entity::house::Entity as HouseEntity;
 use sea_orm::{ActiveModelTrait, EntityTrait, Set};
 use uuid::Uuid;
 
@@ -19,7 +19,7 @@ pub async fn all_houses(
         .map_err(|_error| StatusCode::INTERNAL_SERVER_ERROR)?
         .into_iter()
         .map(|db_house| House {
-            id: db_house.id.to_string(),
+            id: db_house.id,
             title: db_house.title,
             body: db_house.body,
         })
@@ -29,34 +29,33 @@ pub async fn all_houses(
 }
 
 pub async fn update_house(
-  State(database): State<Arc<AppState>>,
-  Path(id): Path<Uuid>,
-  Json(house_params): Json<CreateHouse>,
+    State(database): State<Arc<AppState>>,
+    Path(id): Path<Uuid>,
+    Json(house_params): Json<CreateHouse>,
 ) -> Result<Json<House>, StatusCode> {
+    let update_house = house::ActiveModel {
+        id: Set(id),
+        title: Set(house_params.title),
+        body: Set(house_params.body),
+    };
 
-  let update_house = house::ActiveModel {
-    id: Set(id.to_string()),
-    title: Set(house_params.title),
-    body: Set(house_params.body)
-  };
+    match update_house.update(&database.db).await {
+        Ok(updated_house) => {
+            let response_json = Json(House {
+                id: updated_house.id,
+                title: updated_house.title,
+                body: updated_house.body,
+            });
 
-  match update_house.update(&database.db).await {
-    Ok(updated_house) => {
-      let response_json = Json(House {
-        id: updated_house.id,
-        title: updated_house.title,
-        body: updated_house.body
-      });
-
-      Ok(response_json)
+            Ok(response_json)
+        }
+        Err(db_err) => {
+            let status_code = match db_err {
+                _ => StatusCode::INTERNAL_SERVER_ERROR,
+            };
+            Err(status_code)
+        }
     }
-    Err(db_err) => {
-      let status_code = match db_err {
-        _ => StatusCode::INTERNAL_SERVER_ERROR,
-      };
-      Err(status_code)
-    }
-  }
 }
 
 pub async fn create_house(
@@ -64,7 +63,7 @@ pub async fn create_house(
     Json(house_params): Json<CreateHouse>,
 ) -> Result<Json<House>, StatusCode> {
     let new_house = house::ActiveModel {
-        id: Set(Uuid::new_v4().to_string()),
+        id: Set(Uuid::new_v4()),
         title: Set(house_params.title),
         body: Set(house_params.body),
         ..Default::default()
@@ -81,6 +80,7 @@ pub async fn create_house(
             Ok(response_json)
         }
         Err(db_err) => {
+            println!("{}", db_err);
             let status_code = match db_err {
                 _ => StatusCode::INTERNAL_SERVER_ERROR,
             };
@@ -95,14 +95,11 @@ pub async fn find_house(
 ) -> Result<Json<House>, StatusCode> {
     let id = id.to_owned();
 
-    let house = HouseEntity::find_by_id(id)
-        .one(&database.db)
-        .await
-        .unwrap();
+    let house = HouseEntity::find_by_id(id).one(&database.db).await.unwrap();
 
     if let Some(house) = house {
         Ok(Json(House {
-            id: house.id.to_string(),
+            id: house.id,
             title: house.title,
             body: house.body,
         }))
