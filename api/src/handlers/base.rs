@@ -17,7 +17,9 @@ pub async fn root_path() -> impl IntoResponse {
 pub async fn get_houses_web(State(database): State<Arc<AppState>>) -> impl IntoResponse {
     let list_houses = HouseEntity::find().all(&database.db).await.unwrap();
 
-    Records { houses: list_houses }
+    Records {
+        houses: list_houses,
+    }
 }
 
 pub async fn create_house_web(
@@ -31,7 +33,9 @@ pub async fn create_house_web(
         ..Default::default()
     };
     let insert_response = new_house.insert(&database.db).await.unwrap();
-    HouseNewTemplate { house: insert_response };
+    HouseNewTemplate {
+        house: insert_response,
+    };
 }
 
 #[derive(Template)]

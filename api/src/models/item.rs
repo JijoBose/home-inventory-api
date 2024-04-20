@@ -11,7 +11,7 @@ pub struct Item {
     pub category: String,
     pub purchase_date: String,
     pub expiry_date: Option<String>,
-    pub value: f64
+    pub value: f64,
 }
 
 /// New Item.
@@ -23,7 +23,7 @@ pub struct NewItem {
     pub category: String,
     pub purchase_date: String,
     pub expiry_date: Option<String>,
-    pub value: f64
+    pub value: f64,
 }
 
 #[derive(Deserialize)]
@@ -33,10 +33,10 @@ pub struct ItemQuery {
 
 // validations
 impl NewItem {
-  pub fn validate(&self) -> Result<(), String> {
-      if self.name.trim().is_empty() {
-          return Err("Name is empty".to_string());
-      }
-      Ok(())
-  }
+    pub fn validate(&self) -> Result<(), String> {
+        if self.name.trim().is_empty() {
+            return Err("Name is empty".to_string());
+        }
+        Ok(())
+    }
 }
