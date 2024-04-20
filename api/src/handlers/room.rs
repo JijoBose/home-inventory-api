@@ -8,7 +8,7 @@ use entity::room::Entity as RoomEntity;
 use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set};
 use uuid::Uuid;
 
-use crate::models::room::{Room, CreateRoom};
+use crate::models::room::{CreateRoom, Room};
 
 // Todo - Fix internal server error
 pub async fn list_rooms(

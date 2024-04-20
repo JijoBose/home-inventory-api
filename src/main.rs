@@ -1,3 +1,3 @@
 fn main() {
-  inventory_api::main();
+    inventory_api::main();
 }

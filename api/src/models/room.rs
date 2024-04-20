@@ -23,10 +23,10 @@ pub struct CreateRoom {
 
 // validations
 impl CreateRoom {
-  pub fn validate(&self) -> Result<(), String> {
-      if self.name.trim().is_empty() {
-          return Err("Name is empty".to_string());
-      }
-      Ok(())
-  }
+    pub fn validate(&self) -> Result<(), String> {
+        if self.name.trim().is_empty() {
+            return Err("Name is empty".to_string());
+        }
+        Ok(())
+    }
 }

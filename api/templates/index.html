@@ -1,15 +1,25 @@
-{% extends "base.html" %}
-
-{% block title %}Index{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Index{% endblock %} {% block content
+%}
 <h1>Inventory App</h1>
 <form id="add-form">
-  <input placeholder="Your House name" required type=text name="title">
-  <input placeholder="Description" required type=text name="body">
-  <button hx-post="/houses" hx-trigger="click" hx-target="#houses-content" hx-swap="beforeend">Add</button>
+  <input placeholder="Your House name" required type="text" name="title" />
+  <input placeholder="Description" required type="text" name="body" />
+  <button
+    hx-post="/houses"
+    hx-trigger="click"
+    hx-target="#houses-content"
+    hx-swap="beforeend"
+  >
+    Add
+  </button>
 </form>
-<div id="list" hx-get="/houses" hx-target="this" hx-trigger="load" hx-swap="outerHTML">
+<div
+  id="list"
+  hx-get="/houses"
+  hx-target="this"
+  hx-trigger="load"
+  hx-swap="outerHTML"
+>
   Loading...
 </div>
 {% endblock %}
