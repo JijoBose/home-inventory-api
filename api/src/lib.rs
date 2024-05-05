@@ -2,6 +2,7 @@ use anyhow::Ok;
 use axum::serve;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{Database, DatabaseConnection};
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use std::sync::Arc;
 use tokio::net::TcpListener;
 
@@ -24,7 +25,12 @@ async fn start() -> anyhow::Result<()> {
     Migrator::up(&db_connection, None).await?;
 
     // Initialize tracing
-    tracing_subscriber::fmt::init();
+    let filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info"));
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(tracing_subscriber::fmt::layer())
+        .init();
 
     let app = routes::create_routes(Arc::new(AppState {
         db: db_connection.clone(),
@@ -40,6 +46,6 @@ pub fn main() {
     let result = start();
 
     if let Some(err) = result.err() {
-        println!("Error: {err}");
+        println!("Main: Error: {err}");
     }
 }
