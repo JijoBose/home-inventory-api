@@ -10,27 +10,25 @@ use uuid::Uuid;
 
 use crate::models::room::{CreateRoom, Room};
 
-// Todo - Fix internal server error
 pub async fn list_rooms(
     State(database): State<Arc<AppState>>,
     Path(house_id): Path<Uuid>,
 ) -> Result<Json<Vec<Room>>, StatusCode> {
     let house_id = house_id.to_owned();
-
-    let get_rooms = RoomEntity::find()
-        .filter(room::Column::HouseId.contains(house_id))
+    let list_rooms = RoomEntity::find()
+        .filter(room::Column::HouseId.eq(house_id))
         .all(&database.db)
         .await
-        .map_err(|_error| StatusCode::INTERNAL_SERVER_ERROR)?
+        .map_err(|_error|
+        StatusCode::INTERNAL_SERVER_ERROR)?
         .into_iter()
         .map(|db_room| Room {
-            id: db_room.id.to_string(),
-            name: db_room.name,
-            house_id: db_room.house_id.to_string(),
+          id: db_room.id.to_string(),
+          name: db_room.name,
+          house_id: db_room.house_id.to_string(),
         })
         .collect();
-
-    Ok(Json(get_rooms))
+    Ok(Json(list_rooms))
 }
 
 pub async fn create_rooms(
@@ -61,5 +59,24 @@ pub async fn create_rooms(
             };
             Err(status_code)
         }
+    }
+}
+
+pub async fn find_room(
+    State(database): State<Arc<AppState>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Room>, StatusCode> {
+    let id = id.to_owned();
+
+    let room = RoomEntity::find_by_id(id).one(&database.db).await.unwrap();
+
+    if let Some(room) = room {
+        Ok(Json(Room {
+            id: room.id.to_string(),
+            name: room.name,
+            house_id: room.house_id.to_string(),
+        }))
+    } else {
+        Err(StatusCode::NOT_FOUND)
     }
 }
