@@ -27,6 +27,6 @@ strum = { version = "0.26.0", features = ["derive"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tokio = { version = "1.35.1", features = ["net", "full"] }
-sea-orm = { version = "0.12.12", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
+sea-orm = { version = "1.0.0", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
 entity = { path = "../entity" }
 migration = { path = "../migration" }

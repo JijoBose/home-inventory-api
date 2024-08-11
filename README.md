@@ -37,4 +37,4 @@ App to manage your inventories
 
 **Update Entity**
 
-``sea-orm-cli generate entity -u postgres://jijobose:password@localhost/loco_app -o entity/src``
+``sea-orm-cli generate entity -u postgres://user:password@localhost/home_inventory -o entity/src``
